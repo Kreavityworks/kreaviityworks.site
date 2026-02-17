@@ -783,12 +783,9 @@ const App: React.FC = () => {
 
   // Settings State
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [avatar, setAvatar] = useState<string>(AVATAR_OPTIONS[6] ?? AVATAR_OPTIONS[0]); // Default Nando with fallback
+  const [avatar, setAvatar] = useState<string>(AVATAR_OPTIONS[6] || AVATAR_OPTIONS[0] || ""); // Strict String Fallback
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [language, setLanguage] = useState('en');
-
-  // Chat State
-  const [chatMode, setChatMode] = useState('system'); // system, group, personal
 
   // User Profile State
   const [userProfile, setUserProfile] = useState<UserProfile>({
@@ -945,7 +942,7 @@ const App: React.FC = () => {
          setUserProfile={setUserProfile}
       />
 
-      {/* AI Assistant - Ultra Sharp Monochrome (Reverted to System Only) */}
+      {/* AI Assistant - Ultra Sharp Monochrome (Single System Focus) */}
       <div className={`fixed bottom-10 right-10 z-50 flex flex-col items-end transition-all duration-500 ${isChatOpen ? 'w-[400px]' : 'w-20'}`}>
         {isChatOpen && (
           <div className={`w-full h-[600px] rounded-2xl shadow-2xl border flex flex-col overflow-hidden mb-6 animate-in slide-in-from-bottom-8 ${isDarkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-black/10'}`}>
