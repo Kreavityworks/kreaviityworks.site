@@ -1,17 +1,17 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   LayoutDashboard, 
   Bell, 
   Calendar, 
-  Users, 
+  Briefcase, 
+  Cpu, 
   DollarSign, 
-  MessageSquare, 
+  User as UserIcon, 
   Search, 
   MoreVertical, 
   Plus, 
   ChevronRight, 
   ChevronLeft, 
-  Cpu, 
   History, 
   CheckCircle, 
   FileText, 
@@ -21,29 +21,21 @@ import {
   StickyNote, 
   Wallet, 
   LogOut, 
-  Send, 
-  User as UserIcon, 
   Lock, 
   Settings, 
-  Briefcase, 
-  ExternalLink, 
   Eye, 
   X, 
-  Edit3,
-  Layers,
-  Zap,
-  Image,
-  Video,
-  Activity,
-  Globe,
-  Moon,
-  Sun,
-  Trash2,
+  Edit3, 
+  Zap, 
+  Image, 
+  Activity, 
+  Globe, 
+  Moon, 
+  Sun, 
+  Trash2, 
   Save,
-  Check,
-  MessageCircle,
-  Hash,
-  Key
+  Send,
+  MessageSquare
 } from 'lucide-react';
 
 // --- Types & Interfaces ---
@@ -84,16 +76,13 @@ interface FormData {
 // --- Constants & Data ---
 
 const AVATAR_OPTIONS: string[] = [
-  // Wanita
   'https://api.dicebear.com/7.x/avataaars/svg?seed=Jessica&backgroundColor=ffdfbf&clothing=blazerAndShirt&top=longHairBun',
   'https://api.dicebear.com/7.x/avataaars/svg?seed=Sophia&backgroundColor=ffdfbf&clothing=blazerAndShirt&top=longHairStraight&glasses=round',
   'https://api.dicebear.com/7.x/avataaars/svg?seed=Amelia&backgroundColor=ffdfbf&clothing=shirtCrewNeck&top=shortHairShaggyMullet',
-  
-  // Pria
   'https://api.dicebear.com/7.x/avataaars/svg?seed=Robert&backgroundColor=c0aede&clothing=blazerAndShirt&top=shortHairShortFlat&facialHair=beardMedium',
   'https://api.dicebear.com/7.x/avataaars/svg?seed=James&backgroundColor=b6e3f4&clothing=collarAndSweater&top=shortHairTheCaesar&glasses=wayfarers',
   'https://api.dicebear.com/7.x/avataaars/svg?seed=William&backgroundColor=c0aede&clothing=shirtScoopNeck&top=shortHairFrizzle&facialHair=beardLight',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Nando&backgroundColor=b6e3f4&clothing=hoodie&top=shortHairTheCaesarSidePart&facialHair=beardMajestic', // Default Boss Nando
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=Nando&backgroundColor=b6e3f4&clothing=hoodie&top=shortHairTheCaesarSidePart&facialHair=beardMajestic', // Boss
   'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael&backgroundColor=ffdfbf&clothing=blazerAndSweater&top=shortHairDreads01',
   'https://api.dicebear.com/7.x/avataaars/svg?seed=David&backgroundColor=c0aede&clothing=shirtVNeck&top=shortHairSides',
   'https://api.dicebear.com/7.x/avataaars/svg?seed=Thomas&backgroundColor=b6e3f4&clothing=graphicShirt&top=shortHairShortCurly&facialHair=moustacheFancy',
@@ -113,17 +102,28 @@ interface ModalWrapperProps {
   isDarkMode: boolean;
 }
 
+// FIXED: Modal responsive logic for iPhone 16 Pro
 const ModalWrapper: React.FC<ModalWrapperProps> = ({ isOpen, onClose, title, children, isDarkMode }) => {
   if (!isOpen) return null;
   
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
-      <div className={`w-full max-w-md p-8 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-300 border overflow-y-auto max-h-[90vh] scrollbar-hide ${isDarkMode ? 'bg-[#1a1a1a] border-white/10 text-white' : 'bg-white border-black/10 text-black'}`}>
-        <div className="flex justify-between items-center mb-6 sticky top-0 bg-inherit z-10 pb-2 border-b border-inherit">
-          <h3 className="text-xl font-bold tracking-tight uppercase whitespace-pre-line">{title}</h3>
-          <button onClick={onClose} className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}><X size={20} /></button>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md animate-in fade-in duration-300 px-4 pb-4 md:pb-0">
+      {/* Container: w-full with max-width constraint, auto margins, and max-height for scrolling */}
+      <div className={`relative w-full max-w-md md:max-w-lg p-5 md:p-8 rounded-3xl shadow-2xl animate-in zoom-in-95 duration-300 border flex flex-col max-h-[85vh] ${isDarkMode ? 'bg-[#1a1a1a] border-white/10 text-white' : 'bg-white border-black/10 text-black'}`}>
+        
+        {/* Header - Sticky */}
+        <div className="flex justify-between items-center mb-6 pb-4 border-b border-inherit shrink-0">
+          <h3 className="text-lg md:text-xl font-bold tracking-tight uppercase truncate pr-4">{title}</h3>
+          <button onClick={onClose} className={`p-2 rounded-xl transition-colors shrink-0 ${isDarkMode ? 'bg-white/5 hover:bg-white/10' : 'bg-black/5 hover:bg-black/10'}`}>
+            <X size={20} />
+          </button>
         </div>
-        {children}
+
+        {/* Scrollable Content */}
+        <div className="overflow-y-auto scrollbar-hide -mr-2 pr-2">
+           {children}
+        </div>
+
       </div>
     </div>
   );
@@ -132,25 +132,25 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({ isOpen, onClose, title, chi
 // --- Sub-Components ---
 
 const UpdatesView: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) => (
-  <div className="space-y-12 animate-in fade-in slide-in-from-left-4 duration-500">
-    <div className={`flex justify-between items-end border-b pb-8 ${isDarkMode ? 'border-white/10' : 'border-black/10'}`}>
+  <div className="space-y-6 md:space-y-12 animate-in fade-in slide-in-from-left-4 duration-500">
+    <div className={`flex flex-col md:flex-row md:justify-between md:items-end border-b pb-4 md:pb-8 gap-2 ${isDarkMode ? 'border-white/10' : 'border-black/10'}`}>
       <div className="text-left">
-        <h2 className="text-5xl font-medium tracking-tighter">System Updates</h2>
-        <p className={`mt-2 font-medium ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>Berita dan integrasi terbaru sistem KreavityWorks.</p>
+        <h2 className="text-2xl md:text-4xl font-medium tracking-tighter">System Updates</h2>
+        <p className={`mt-1 font-medium text-xs md:text-base ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>Berita dan integrasi terbaru.</p>
       </div>
     </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
       {[1, 2, 3].map((i) => (
-        <div key={i} className={`group p-8 rounded-2xl border transition-all cursor-pointer shadow-sm ${isDarkMode ? 'bg-[#1a1a1a] border-white/5 hover:border-white/20' : 'bg-white border-black/5 hover:border-black/20'}`}>
-          <div className="flex justify-between mb-8">
-            <span className={`text-[10px] uppercase tracking-[0.2em] font-bold ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>Log v.2.9 • 17 Feb</span>
-            <MoreVertical size={18} className={`${isDarkMode ? 'text-white/20 group-hover:text-white' : 'text-black/20 group-hover:text-black'} transition-colors`} />
+        <div key={i} className={`group p-5 md:p-6 rounded-2xl border transition-all cursor-pointer shadow-sm ${isDarkMode ? 'bg-[#1a1a1a] border-white/5 hover:border-white/20' : 'bg-white border-black/5 hover:border-black/20'}`}>
+          <div className="flex justify-between mb-4 md:mb-6">
+            <span className={`text-[10px] uppercase tracking-[0.2em] font-bold ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>Log v.3.2 • 17 Feb</span>
+            <MoreVertical size={16} className={`${isDarkMode ? 'text-white/20 group-hover:text-white' : 'text-black/20 group-hover:text-black'} transition-colors`} />
           </div>
-          <h3 className="text-2xl font-medium tracking-tight mb-4" contentEditable>Neural Workflow 2.0</h3>
-          <p className={`text-sm leading-relaxed mb-8 ${isDarkMode ? 'text-white/50' : 'text-black/50'}`} contentEditable>Optimasi rendering pipeline untuk mempercepat delivery aset brand sebesar 40%.</p>
-          <div className={`flex items-center gap-3 pt-8 border-t ${isDarkMode ? 'border-white/5' : 'border-black/5'}`}>
-            <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>N</div>
-            <span className="text-xs font-bold uppercase tracking-widest">System Director</span>
+          <h3 className="text-lg md:text-xl font-medium tracking-tight mb-2 md:mb-3" contentEditable>Neural Workflow 2.0</h3>
+          <p className={`text-xs md:text-sm leading-relaxed mb-4 md:mb-6 ${isDarkMode ? 'text-white/50' : 'text-black/50'}`} contentEditable>Optimasi rendering pipeline untuk mempercepat delivery aset brand sebesar 40%.</p>
+          <div className={`flex items-center gap-3 pt-4 md:pt-6 border-t ${isDarkMode ? 'border-white/5' : 'border-black/5'}`}>
+            <div className={`w-6 h-6 md:w-8 md:h-8 rounded-lg flex items-center justify-center text-[10px] font-bold ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>N</div>
+            <span className="text-[10px] font-bold uppercase tracking-widest">System Director</span>
           </div>
         </div>
       ))}
@@ -158,7 +158,7 @@ const UpdatesView: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) => (
   </div>
 );
 
-const CalendarView: React.FC<{ onAddEvent: (title: string, mode?: string) => void; isDarkMode: boolean }> = ({ onAddEvent, isDarkMode }) => {
+const CalendarView: React.FC<{ onAddEvent: (title: string) => void; isDarkMode: boolean }> = ({ onAddEvent, isDarkMode }) => {
   const [viewDate, setViewDate] = useState(new Date());
   const daysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
   const firstDay = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1).getDay();
@@ -166,41 +166,41 @@ const CalendarView: React.FC<{ onAddEvent: (title: string, mode?: string) => voi
 
   return (
     <div className="animate-in fade-in slide-in-from-left-4 duration-500">
-      <div className={`flex justify-between items-end border-b pb-8 mb-12 ${isDarkMode ? 'border-white/10' : 'border-black/10'}`}>
-        <div className="text-left">
-          <h2 className="text-5xl font-medium tracking-tighter">{monthNames[viewDate.getMonth()]} {viewDate.getFullYear()}</h2>
-          <p className={`mt-2 font-medium ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>Atur jadwal produksi dan meeting talent.</p>
+      <div className={`flex flex-col md:flex-row justify-between items-start md:items-end border-b pb-4 md:pb-8 mb-6 md:mb-12 gap-4 ${isDarkMode ? 'border-white/10' : 'border-black/10'}`}>
+        <div className="text-left w-full md:w-auto">
+          <h2 className="text-2xl md:text-4xl font-medium tracking-tighter">{monthNames[viewDate.getMonth()]} {viewDate.getFullYear()}</h2>
+          <p className={`mt-1 font-medium text-xs md:text-base ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>Atur jadwal produksi.</p>
         </div>
-        <div className="flex items-center gap-6">
+        <div className="flex w-full md:w-auto items-center gap-3">
           <div className={`flex p-1 rounded-xl ${isDarkMode ? 'bg-white/5' : 'bg-black/5'}`}>
-            <button onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1))} className={`p-3 rounded-lg transition-all ${isDarkMode ? 'hover:bg-white/10 text-white' : 'hover:bg-white text-black'}`}><ChevronLeft size={20} /></button>
-            <button onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1))} className={`p-3 rounded-lg transition-all ${isDarkMode ? 'hover:bg-white/10 text-white' : 'hover:bg-white text-black'}`}><ChevronRight size={20} /></button>
+            <button onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1))} className={`p-2 md:p-3 rounded-lg transition-all ${isDarkMode ? 'hover:bg-white/10 text-white' : 'hover:bg-white text-black'}`}><ChevronLeft size={18} /></button>
+            <button onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1))} className={`p-2 md:p-3 rounded-lg transition-all ${isDarkMode ? 'hover:bg-white/10 text-white' : 'hover:bg-white text-black'}`}><ChevronRight size={18} /></button>
           </div>
-          <button onClick={() => onAddEvent('New Project Schedule', 'add-event')} className={`flex items-center gap-2 px-8 py-3.5 rounded-xl text-xs font-bold uppercase tracking-widest hover:opacity-90 ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>
-            <Plus size={14} /> Add Event
+          <button onClick={() => onAddEvent('New Project Schedule')} className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-4 md:px-8 py-3 rounded-xl text-[10px] md:text-xs font-bold uppercase tracking-widest hover:opacity-90 ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>
+            <Plus size={12} /> <span className="inline">Event</span>
           </button>
         </div>
       </div>
 
-      <div className={`rounded-2xl border p-8 shadow-sm ${isDarkMode ? 'bg-[#1a1a1a] border-white/5' : 'bg-white border-black/5'}`}>
-        <div className={`grid grid-cols-7 gap-4 mb-8 text-center text-[10px] uppercase tracking-[0.2em] font-bold ${isDarkMode ? 'text-white/30' : 'text-black/30'}`}>
+      <div className={`rounded-2xl border p-4 md:p-8 shadow-sm ${isDarkMode ? 'bg-[#1a1a1a] border-white/5' : 'bg-white border-black/5'}`}>
+        <div className={`grid grid-cols-7 gap-2 md:gap-4 mb-4 text-center text-[8px] md:text-[10px] uppercase tracking-[0.2em] font-bold ${isDarkMode ? 'text-white/30' : 'text-black/30'}`}>
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => <div key={day}>{day}</div>)}
         </div>
-        <div className="grid grid-cols-7 gap-4">
+        <div className="grid grid-cols-7 gap-1 md:gap-4">
           {Array.from({ length: firstDay }).map((_, i) => <div key={`empty-${i}`} />)}
           {Array.from({ length: daysInMonth(viewDate.getFullYear(), viewDate.getMonth()) }).map((_, i) => (
             <div 
               key={i} 
-              onClick={() => onAddEvent(`Event Details: Day ${i+1}`, 'default')}
-              className={`group min-h-[120px] rounded-xl p-4 border transition-all flex flex-col justify-between cursor-pointer ${isDarkMode ? 'border-white/5 hover:bg-white hover:text-black text-white' : 'border-black/[0.04] hover:bg-black hover:text-white text-black'}`}
+              onClick={() => onAddEvent(`Event Details: Day ${i+1}`)}
+              className={`group min-h-[50px] md:min-h-[120px] rounded-lg md:rounded-xl p-1.5 md:p-4 border transition-all flex flex-col justify-between cursor-pointer ${isDarkMode ? 'border-white/5 hover:bg-white hover:text-black text-white' : 'border-black/[0.04] hover:bg-black hover:text-white text-black'}`}
             >
               <div className="flex justify-between items-start">
-                <span className="text-sm font-black opacity-30 group-hover:opacity-100">{i + 1}</span>
-                <Plus size={12} className="opacity-0 group-hover:opacity-100" />
+                <span className="text-[10px] md:text-sm font-black opacity-30 group-hover:opacity-100">{i + 1}</span>
+                <Plus size={10} className="hidden md:block opacity-0 group-hover:opacity-100" />
               </div>
               {i === 14 && (
-                <div className={`p-1.5 rounded-md text-[9px] font-bold uppercase tracking-tighter truncate ${isDarkMode ? 'bg-white text-black group-hover:bg-black group-hover:text-white' : 'bg-black text-white group-hover:bg-white group-hover:text-black'}`}>
-                  Meeting: Reza
+                <div className={`p-1 rounded md:rounded-md text-[6px] md:text-[9px] font-bold uppercase tracking-tighter truncate ${isDarkMode ? 'bg-white text-black group-hover:bg-black group-hover:text-white' : 'bg-black text-white group-hover:bg-white group-hover:text-black'}`}>
+                  Meeting
                 </div>
               )}
             </div>
@@ -301,22 +301,67 @@ const QueueView: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) => {
     setQueueItems(queueItems.filter(i => i.id !== id));
   };
 
-  const inputClass = `w-full px-4 py-3 rounded-xl text-sm font-bold outline-none transition-all ${isDarkMode ? 'bg-black/20 focus:bg-black/40 text-white placeholder-white/20' : 'bg-black/5 focus:bg-white focus:ring-1 ring-black text-black'}`;
-  const labelClass = `text-[10px] font-black uppercase tracking-widest mb-2 block ${isDarkMode ? 'text-white/40' : 'text-black/40'}`;
+  // FIXED: Text-base for mobile input to prevent zoom
+  const inputClass = `w-full px-4 py-3 rounded-xl text-base md:text-sm font-bold outline-none transition-all ${isDarkMode ? 'bg-black/20 focus:bg-black/40 text-white placeholder-white/20' : 'bg-black/5 focus:bg-white focus:ring-1 ring-black text-black'}`;
+  const labelClass = `text-[9px] md:text-[10px] font-black uppercase tracking-widest mb-2 block ${isDarkMode ? 'text-white/40' : 'text-black/40'}`;
+
+  // Card Component for Mobile View
+  const MobileCard = ({ item }: { item: QueueItem }) => (
+    <div className={`p-5 rounded-2xl border mb-4 shadow-sm ${isDarkMode ? 'bg-[#1a1a1a] border-white/5' : 'bg-white border-black/5'}`}>
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h4 className="text-base font-bold">{item.talent}</h4>
+          <p className={`text-[10px] uppercase tracking-wider font-bold ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>{item.client}</p>
+        </div>
+        <span className={`px-2 py-1 text-[8px] rounded-lg font-black uppercase tracking-widest ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>
+          {item.status}
+        </span>
+      </div>
+      <div className="space-y-3 mb-6">
+        <div className="flex justify-between text-xs">
+          <span className={isDarkMode ? 'text-white/40' : 'text-black/40'}>Project</span>
+          <span className="font-bold">{item.project}</span>
+        </div>
+        <div className="flex justify-between text-xs">
+          <span className={isDarkMode ? 'text-white/40' : 'text-black/40'}>Price</span>
+          <span className="font-bold">{item.price}</span>
+        </div>
+        <div className="flex justify-between text-xs">
+          <span className={isDarkMode ? 'text-white/40' : 'text-black/40'}>Timeline</span>
+          <span className="font-bold">{item.startDate}</span>
+        </div>
+      </div>
+      <div className="flex gap-2">
+        <button onClick={() => handleOpenEdit(item)} className={`flex-1 py-3 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-colors ${isDarkMode ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`}>Edit</button>
+        <button onClick={() => handleDelete(item.id)} className={`px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-wider bg-red-500/10 text-red-500`}>Del</button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="animate-in fade-in slide-in-from-left-4 duration-500">
-      <div className={`flex justify-between items-end border-b pb-8 mb-10 text-left ${isDarkMode ? 'border-white/10' : 'border-black/10'}`}>
+      <div className={`flex justify-between items-end border-b pb-4 md:pb-8 mb-8 text-left ${isDarkMode ? 'border-white/10' : 'border-black/10'}`}>
         <div>
-          <h2 className="text-5xl font-medium tracking-tighter">Client Queue</h2>
-          <p className={`mt-2 font-medium ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>Monitoring status talent dan proposal aktif.</p>
+          <h2 className="text-2xl md:text-4xl font-medium tracking-tighter">Client Queue</h2>
+          <p className={`mt-1 font-medium text-xs md:text-base ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>Monitoring status talent.</p>
         </div>
-        <button onClick={handleOpenAdd} className={`flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:opacity-90 ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>
-           <Plus size={14} /> Add Queue
+        <button onClick={handleOpenAdd} className={`flex items-center gap-2 px-4 md:px-6 py-3 rounded-xl text-[10px] md:text-xs font-bold uppercase tracking-widest hover:opacity-90 ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>
+           <Plus size={12} /> <span className="hidden md:inline">Add Queue</span> <span className="md:hidden">Add</span>
         </button>
       </div>
 
-      <div className={`rounded-2xl border overflow-hidden shadow-sm ${isDarkMode ? 'bg-[#1a1a1a] border-white/5' : 'bg-white border-black/5'}`}>
+      {/* Mobile View: Cards */}
+      <div className="md:hidden">
+        {queueItems.map(item => <MobileCard key={item.id} item={item} />)}
+        {queueItems.length === 0 && (
+           <div className={`p-8 text-center text-xs font-bold uppercase tracking-widest opacity-30 ${isDarkMode ? 'text-white' : 'text-black'}`}>
+              No Active Queue
+           </div>
+        )}
+      </div>
+
+      {/* Desktop View: Table */}
+      <div className={`hidden md:block rounded-2xl border overflow-hidden shadow-sm ${isDarkMode ? 'bg-[#1a1a1a] border-white/5' : 'bg-white border-black/5'}`}>
         <table className="w-full text-left">
           <thead className={`${isDarkMode ? 'bg-white/5 text-white/40' : 'bg-black/5 text-black/40'} text-[10px] uppercase tracking-[0.2em] font-black`}>
             <tr>
@@ -384,7 +429,7 @@ const QueueView: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) => {
                 <input type="text" value={formData.project} onChange={e => setFormData({...formData, project: e.target.value})} className={inputClass} placeholder="e.g. Branding" />
                 <div className="flex flex-wrap gap-2 mt-2">
                     {PROJECT_SUGGESTIONS.map((tag, i) => (
-                        <button key={i} onClick={() => setFormData({...formData, project: tag})} className={`px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider border transition-all ${isDarkMode ? 'border-white/10 hover:bg-white/10' : 'border-black/10 hover:bg-black/5'}`}>
+                        <button key={i} onClick={() => setFormData({...formData, project: tag})} className={`px-2 py-1.5 rounded-md text-[8px] font-bold uppercase tracking-wider border transition-all ${isDarkMode ? 'border-white/10 hover:bg-white/10' : 'border-black/10 hover:bg-black/5'}`}>
                             {tag}
                         </button>
                     ))}
@@ -395,8 +440,8 @@ const QueueView: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) => {
                  <div>
                     <label className={labelClass}>Pricing Model</label>
                     <div className={`flex p-1 rounded-xl ${isDarkMode ? 'bg-black/30' : 'bg-black/5'}`}>
-                       <button onClick={() => setFormData({...formData, priceType: 'Fixed'})} className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${formData.priceType === 'Fixed' ? (isDarkMode ? 'bg-white text-black' : 'bg-black text-white') : 'opacity-40'}`}>Fixed</button>
-                       <button onClick={() => setFormData({...formData, priceType: 'Hourly'})} className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${formData.priceType === 'Hourly' ? (isDarkMode ? 'bg-white text-black' : 'bg-black text-white') : 'opacity-40'}`}>Hourly</button>
+                       <button onClick={() => setFormData({...formData, priceType: 'Fixed'})} className={`flex-1 py-2 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${formData.priceType === 'Fixed' ? (isDarkMode ? 'bg-white text-black' : 'bg-black text-white') : 'opacity-40'}`}>Fixed</button>
+                       <button onClick={() => setFormData({...formData, priceType: 'Hourly'})} className={`flex-1 py-2 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${formData.priceType === 'Hourly' ? (isDarkMode ? 'bg-white text-black' : 'bg-black text-white') : 'opacity-40'}`}>Hourly</button>
                     </div>
                  </div>
                  <div>
@@ -444,7 +489,7 @@ const QueueView: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) => {
                 </select>
              </div>
              
-             <button onClick={handleSave} className={`w-full py-4 mt-4 rounded-xl text-xs font-black uppercase tracking-[0.2em] hover:opacity-90 active:scale-95 transition-all ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>
+             <button onClick={handleSave} className={`w-full py-3.5 mt-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-90 active:scale-95 transition-all ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>
                 {editItem ? 'Save Changes' : 'Add to Queue'}
              </button>
           </div>
@@ -462,17 +507,17 @@ const TalentView: React.FC<{ onAction: (title: string) => void; isDarkMode: bool
 
   return (
     <div className="animate-in fade-in slide-in-from-left-4 duration-500">
-      <h2 className="text-5xl font-medium tracking-tighter mb-12 text-left">Talent Ecosystem</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <h2 className="text-2xl md:text-4xl font-medium tracking-tighter mb-6 md:mb-12 text-left">Talent Ecosystem</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
         {sections.map((s, i) => (
-          <div key={i} className={`p-10 rounded-2xl border shadow-sm group transition-all flex flex-col text-left ${isDarkMode ? 'bg-[#1a1a1a] border-white/5 hover:border-white/40' : 'bg-white border-black/5 hover:border-black/40'}`}>
-            <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-8 shadow-lg transition-transform group-hover:-translate-y-1 ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>
-              {React.cloneElement(s.icon, { size: 28 })}
+          <div key={i} className={`p-6 md:p-10 rounded-2xl border shadow-sm group transition-all flex flex-col text-left ${isDarkMode ? 'bg-[#1a1a1a] border-white/5 hover:border-white/40' : 'bg-white border-black/5 hover:border-black/40'}`}>
+            <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center mb-6 md:mb-8 shadow-lg transition-transform group-hover:-translate-y-1 ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>
+              {React.cloneElement(s.icon, { size: 24 })}
             </div>
-            <h3 className="text-2xl font-medium tracking-tight mb-3">{s.title}</h3>
-            <p className={`text-base mb-10 leading-relaxed flex-1 ${isDarkMode ? 'text-white/50' : 'text-black/50'}`}>{s.desc}</p>
-            <button onClick={() => onAction(s.title)} className={`w-full py-4 rounded-xl text-xs font-black uppercase tracking-[0.2em] hover:opacity-90 transition-all flex items-center justify-center gap-3 ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>
-              Open Module <ChevronRight size={18} />
+            <h3 className="text-lg md:text-2xl font-medium tracking-tight mb-2 md:mb-3">{s.title}</h3>
+            <p className={`text-xs md:text-base mb-8 md:mb-10 leading-relaxed flex-1 ${isDarkMode ? 'text-white/50' : 'text-black/50'}`}>{s.desc}</p>
+            <button onClick={() => onAction(s.title)} className={`w-full py-3 md:py-4 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-[0.2em] hover:opacity-90 transition-all flex items-center justify-center gap-3 ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>
+              Open Module <ChevronRight size={16} />
             </button>
           </div>
         ))}
@@ -509,18 +554,18 @@ const FinanceView: React.FC<{ onAction: (title: string) => void; isDarkMode: boo
 
   if (isLocked) {
     return (
-      <div className="h-full flex flex-col items-center justify-center animate-in zoom-in-95 duration-500">
-        <div className={`w-full max-w-sm p-12 rounded-3xl border shadow-2xl ${isDarkMode ? 'bg-[#1a1a1a] border-white/5' : 'bg-white border-black/5'}`}>
+      <div className="h-full flex flex-col items-center justify-center animate-in zoom-in-95 duration-500 py-10 md:py-0">
+        <div className={`w-full max-w-sm p-8 md:p-12 rounded-3xl border shadow-2xl ${isDarkMode ? 'bg-[#1a1a1a] border-white/5' : 'bg-white border-black/5'}`}>
           <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-10 shadow-xl ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>
             <Lock size={28} />
           </div>
-          <h2 className="text-2xl font-medium text-center tracking-tight mb-2 uppercase">Finance Login</h2>
-          <p className={`text-center text-xs mb-10 font-bold tracking-widest uppercase ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>Authorized Only.</p>
+          <h2 className="text-xl md:text-2xl font-medium text-center tracking-tight mb-2 uppercase">Finance Login</h2>
+          <p className={`text-center text-[10px] md:text-xs mb-10 font-bold tracking-widest uppercase ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>Authorized Only.</p>
           <form onSubmit={handleLogin} className="space-y-4">
-            <input type="text" placeholder="Username" className={`w-full px-6 py-4 border-none rounded-xl text-sm font-bold focus:ring-1 outline-none transition-all ${isDarkMode ? 'bg-black/30 focus:bg-black/50 focus:ring-white/20 text-white placeholder-white/20' : 'bg-black/5 focus:bg-white focus:ring-black text-black'}`} value={creds.user} onChange={e => setCreds({...creds, user: e.target.value})} />
-            <input type="password" placeholder="Password" className={`w-full px-6 py-4 border-none rounded-xl text-sm font-bold focus:ring-1 outline-none transition-all ${isDarkMode ? 'bg-black/30 focus:bg-black/50 focus:ring-white/20 text-white placeholder-white/20' : 'bg-black/5 focus:bg-white focus:ring-black text-black'}`} value={creds.pass} onChange={e => setCreds({...creds, pass: e.target.value})} />
+            <input type="text" placeholder="Username" className={`w-full px-6 py-3 md:py-4 border-none rounded-xl text-base md:text-sm font-bold focus:ring-1 outline-none transition-all ${isDarkMode ? 'bg-black/30 focus:bg-black/50 focus:ring-white/20 text-white placeholder-white/20' : 'bg-black/5 focus:bg-white focus:ring-black text-black'}`} value={creds.user} onChange={e => setCreds({...creds, user: e.target.value})} />
+            <input type="password" placeholder="Password" className={`w-full px-6 py-3 md:py-4 border-none rounded-xl text-base md:text-sm font-bold focus:ring-1 outline-none transition-all ${isDarkMode ? 'bg-black/30 focus:bg-black/50 focus:ring-white/20 text-white placeholder-white/20' : 'bg-black/5 focus:bg-white focus:ring-black text-black'}`} value={creds.pass} onChange={e => setCreds({...creds, pass: e.target.value})} />
             {error && <p className="text-red-500 text-[9px] text-center font-black uppercase tracking-widest">Access Denied</p>}
-            <button className={`w-full py-4 rounded-xl text-xs font-black uppercase tracking-[0.2em] mt-4 hover:opacity-90 active:scale-95 transition-all ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>Authorize</button>
+            <button className={`w-full py-3 md:py-4 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-[0.2em] mt-4 hover:opacity-90 active:scale-95 transition-all ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>Authorize</button>
           </form>
         </div>
       </div>
@@ -529,17 +574,17 @@ const FinanceView: React.FC<{ onAction: (title: string) => void; isDarkMode: boo
 
   return (
     <div className="animate-in fade-in slide-in-from-left-4 duration-500">
-      <div className="flex justify-between items-center mb-12 text-left">
-        <h2 className="text-5xl font-medium tracking-tighter">Finance & Ops</h2>
-        <button onClick={() => setIsLocked(true)} className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 transition-all hover:opacity-80 ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>
-          Lock System <Lock size={12} />
+      <div className="flex justify-between items-center mb-8 md:mb-12 text-left">
+        <h2 className="text-2xl md:text-4xl font-medium tracking-tighter">Finance & Ops</h2>
+        <button onClick={() => setIsLocked(true)} className={`px-4 md:px-6 py-2 rounded-lg text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 transition-all hover:opacity-80 ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>
+          Lock <Lock size={12} className="hidden md:block" />
         </button>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {docs.map((doc, i) => (
-          <div key={i} onClick={() => onAction(doc.name)} className={`p-8 rounded-2xl border flex flex-col gap-6 transition-all group cursor-pointer shadow-sm ${isDarkMode ? 'bg-[#1a1a1a] border-white/5 hover:bg-white hover:text-black' : 'bg-white border-black/5 hover:bg-black hover:text-white'}`}>
+          <div key={i} onClick={() => onAction(doc.name)} className={`p-6 md:p-8 rounded-2xl border flex flex-col gap-4 md:gap-6 transition-all group cursor-pointer shadow-sm ${isDarkMode ? 'bg-[#1a1a1a] border-white/5 hover:bg-white hover:text-black' : 'bg-white border-black/5 hover:bg-black hover:text-white'}`}>
             <div className={`${isDarkMode ? 'text-white group-hover:text-black' : 'text-black group-hover:text-white'} transition-colors`}>{React.cloneElement(doc.icon, { size: 24 })}</div>
-            <span className="text-sm font-bold tracking-tight leading-tight uppercase">{doc.name}</span>
+            <span className="text-xs md:text-sm font-bold tracking-tight leading-tight uppercase">{doc.name}</span>
           </div>
         ))}
       </div>
@@ -555,30 +600,30 @@ interface UserViewProps {
 }
 
 const UserView: React.FC<UserViewProps> = ({ onAction, currentAvatar, isDarkMode, userProfile }) => (
-  <div className="animate-in fade-in slide-in-from-left-4 duration-500 space-y-16">
-    <div className={`flex justify-between items-end border-b pb-10 text-left ${isDarkMode ? 'border-white/10' : 'border-black/10'}`}>
+  <div className="animate-in fade-in slide-in-from-left-4 duration-500 space-y-10 md:space-y-16">
+    <div className={`flex justify-between items-end border-b pb-4 md:pb-10 text-left ${isDarkMode ? 'border-white/10' : 'border-black/10'}`}>
       <div>
-        <h2 className="text-5xl font-medium tracking-tighter">Profile Management</h2>
-        <p className={`mt-2 font-medium ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>Kelola akun dan brankas data pribadimu.</p>
+        <h2 className="text-2xl md:text-4xl font-medium tracking-tighter">Profile Management</h2>
+        <p className={`mt-2 font-medium text-xs md:text-base ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>Kelola akun dan brankas data pribadimu.</p>
       </div>
     </div>
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 text-left">
-      <div className={`p-12 rounded-2xl border flex flex-col items-center text-center shadow-sm h-fit ${isDarkMode ? 'bg-[#1a1a1a] border-white/5' : 'bg-white border-black/5'}`}>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-16 text-left">
+      <div className={`p-8 md:p-12 rounded-2xl border flex flex-col items-center text-center shadow-sm h-fit ${isDarkMode ? 'bg-[#1a1a1a] border-white/5' : 'bg-white border-black/5'}`}>
         <div className="relative group mb-8">
-          <div className={`w-32 h-32 rounded-full overflow-hidden border-4 transition-all shadow-xl ${isDarkMode ? 'border-white/5 group-hover:border-white/20' : 'border-black/5 group-hover:border-black/20'}`}>
-            <img src={currentAvatar} alt="Profile" className="w-full h-full object-cover" />
+          <div className={`w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 transition-all shadow-xl ${isDarkMode ? 'border-white/5 group-hover:border-white/20' : 'border-black/5 group-hover:border-black/20'}`}>
+            <img src={currentAvatar || AVATAR_OPTIONS[0]} alt="Profile" className="w-full h-full object-cover" />
           </div>
           <button onClick={() => onAction('System Settings')} className={`absolute bottom-2 right-2 p-2 rounded-lg shadow-2xl hover:scale-110 transition-transform ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}><Settings size={16} /></button>
         </div>
-        <h3 className="text-3xl font-black tracking-tight">{userProfile.name}</h3>
-        <p className={`text-[10px] uppercase tracking-[0.3em] font-black mt-2 ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>{userProfile.title}</p>
-        <div className={`w-full h-[1px] my-10 ${isDarkMode ? 'bg-white/5' : 'bg-black/5'}`}></div>
+        <h3 className="text-2xl md:text-3xl font-black tracking-tight">{userProfile.name}</h3>
+        <p className={`text-[9px] md:text-[10px] uppercase tracking-[0.3em] font-black mt-2 ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>{userProfile.title}</p>
+        <div className={`w-full h-[1px] my-8 md:my-10 ${isDarkMode ? 'bg-white/5' : 'bg-black/5'}`}></div>
         <div className="w-full space-y-3">
-          <div className={`flex justify-between items-center text-sm ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>
+          <div className={`flex justify-between items-center text-xs md:text-sm ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>
              <span className="font-bold">Role</span>
              <button onClick={() => onAction('System Settings')} className={`font-bold hover:underline ${isDarkMode ? 'text-white' : 'text-black'}`}>{userProfile.role}</button>
           </div>
-          <div className={`flex justify-between items-center text-sm ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>
+          <div className={`flex justify-between items-center text-xs md:text-sm ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>
              <span className="font-bold">Status</span>
              <span className="font-bold text-emerald-500">Active</span>
           </div>
@@ -589,19 +634,19 @@ const UserView: React.FC<UserViewProps> = ({ onAction, currentAvatar, isDarkMode
         </div>
       </div>
 
-      <div className="lg:col-span-2 space-y-10">
+      <div className="lg:col-span-2 space-y-8 md:space-y-10">
         
         {/* Brankas Section */}
-        <div className={`p-12 rounded-2xl shadow-2xl relative overflow-hidden group ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>
-          <div className="absolute -top-10 -right-10 opacity-5 rotate-12"><Lock size={200} /></div>
-          <h3 className="text-4xl font-medium tracking-tight mb-4 flex items-center gap-4">User Brankas <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/50"></div></h3>
-          <p className={`text-base max-w-sm mb-12 leading-relaxed font-medium ${isDarkMode ? 'text-black/40' : 'text-white/40'}`}>Tempat penyimpanan privat untuk password, link rahasia, dan dokumen sensitif KreavityWorks.</p>
-          <button onClick={() => onAction('Unlock Brankas')} className={`px-10 py-5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:scale-105 transition-all flex items-center gap-4 ${isDarkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>Unlock Brankas <Eye size={16} /></button>
+        <div className={`p-8 md:p-12 rounded-2xl shadow-2xl relative overflow-hidden group ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>
+          <div className="absolute -top-10 -right-10 opacity-5 rotate-12"><Lock size={150} className="w-[150px] h-[150px] md:w-[200px] md:h-[200px]" /></div>
+          <h3 className="text-2xl md:text-4xl font-medium tracking-tight mb-4 flex items-center gap-4">User Brankas <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/50"></div></h3>
+          <p className={`text-xs md:text-base max-w-sm mb-10 md:mb-12 leading-relaxed font-medium ${isDarkMode ? 'text-black/40' : 'text-white/40'}`}>Tempat penyimpanan privat untuk password, link rahasia, dan dokumen sensitif KreavityWorks.</p>
+          <button onClick={() => onAction('Unlock Brankas')} className={`px-8 md:px-10 py-4 md:py-5 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] hover:scale-105 transition-all flex items-center gap-4 ${isDarkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>Unlock Brankas <Eye size={16} /></button>
         </div>
 
         {/* Recent Activity Section */}
         <div>
-           <h4 className={`text-xl font-medium tracking-tight mb-6 flex items-center gap-3 ${isDarkMode ? 'text-white' : 'text-black'}`}>
+           <h4 className={`text-lg md:text-xl font-medium tracking-tight mb-6 flex items-center gap-3 ${isDarkMode ? 'text-white' : 'text-black'}`}>
              <Activity size={20} className="opacity-30" />
              Recent Activity
            </h4>
@@ -612,17 +657,17 @@ const UserView: React.FC<UserViewProps> = ({ onAction, currentAvatar, isDarkMode
                 { action: 'System Update', device: 'Neural Workflow 2.0 Installed', time: 'Yesterday', icon: <Zap size={14} /> },
                 { action: 'Proposal Sent', device: 'To Aether Corp', time: 'Yesterday', icon: <Send size={14} /> },
               ].map((log, i) => (
-                <div key={i} className={`p-6 flex items-center justify-between transition-colors ${isDarkMode ? 'hover:bg-white/[0.02]' : 'hover:bg-black/[0.01]'}`}>
+                <div key={i} className={`p-4 md:p-6 flex items-center justify-between transition-colors ${isDarkMode ? 'hover:bg-white/[0.02]' : 'hover:bg-black/[0.01]'}`}>
                    <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-white/5 text-white/40' : 'bg-black/5 text-black/40'}`}>
-                         {log.icon}
+                      <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-white/5 text-white/40' : 'bg-black/5 text-black/40'}`}>
+                         {React.cloneElement(log.icon, { size: 14 })}
                       </div>
                       <div>
-                         <div className="text-sm font-bold tracking-tight">{log.action}</div>
-                         <div className={`text-[10px] font-bold uppercase tracking-widest ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>{log.device}</div>
+                         <div className="text-xs md:text-sm font-bold tracking-tight">{log.action}</div>
+                         <div className={`text-[8px] md:text-[10px] font-bold uppercase tracking-widest ${isDarkMode ? 'text-white/40' : 'text-black/40'}`}>{log.device}</div>
                       </div>
                    </div>
-                   <div className="text-[10px] font-bold opacity-30">{log.time}</div>
+                   <div className="text-[8px] md:text-[10px] font-bold opacity-30">{log.time}</div>
                 </div>
               ))}
            </div>
@@ -656,19 +701,19 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, currentA
       onClose();
   };
 
-  const inputClass = `w-full px-4 py-3 rounded-xl text-sm font-bold outline-none transition-all ${isDarkMode ? 'bg-black/20 focus:bg-black/40 text-white placeholder-white/20' : 'bg-black/5 focus:bg-white focus:ring-1 ring-black text-black'}`;
-  const labelClass = `text-[10px] font-black uppercase tracking-widest mb-2 block ${isDarkMode ? 'text-white/40' : 'text-black/40'}`;
+  const inputClass = `w-full px-4 py-3 rounded-xl text-base md:text-sm font-bold outline-none transition-all ${isDarkMode ? 'bg-black/20 focus:bg-black/40 text-white placeholder-white/20' : 'bg-black/5 focus:bg-white focus:ring-1 ring-black text-black'}`;
+  const labelClass = `text-[9px] md:text-[10px] font-black uppercase tracking-widest mb-2 block ${isDarkMode ? 'text-white/40' : 'text-black/40'}`;
 
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/70 backdrop-blur-md animate-in fade-in duration-300">
-      <div className={`w-full max-w-2xl p-10 rounded-3xl shadow-2xl animate-in zoom-in-95 duration-300 border overflow-y-auto max-h-[90vh] scrollbar-hide relative ${isDarkMode ? 'bg-[#1a1a1a] border-white/10 text-white' : 'bg-white border-black/10 text-black'}`}>
-        <div className="flex justify-between items-center mb-8 sticky top-0 bg-inherit z-10 pb-2 border-b border-inherit">
-          <h3 className="text-3xl font-medium tracking-tighter">System Settings</h3>
-          <button onClick={onClose} className={`p-3 rounded-xl transition-colors ${isDarkMode ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}><X size={24} /></button>
+    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/70 backdrop-blur-md animate-in fade-in duration-300 px-4 pb-4 md:pb-0">
+      <div className={`w-full max-w-2xl p-5 md:p-10 rounded-3xl shadow-2xl animate-in zoom-in-95 duration-300 border overflow-y-auto max-h-[85vh] scrollbar-hide relative ${isDarkMode ? 'bg-[#1a1a1a] border-white/10 text-white' : 'bg-white border-black/10 text-black'}`}>
+        <div className="flex justify-between items-center mb-6 md:mb-8 sticky top-0 bg-inherit z-10 pb-2 border-b border-inherit shrink-0">
+          <h3 className="text-xl md:text-3xl font-medium tracking-tighter">System Settings</h3>
+          <button onClick={onClose} className={`p-2 md:p-3 rounded-xl transition-colors ${isDarkMode ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}><X size={24} /></button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
           
           <div className="space-y-6">
              {/* Personal Data */}
@@ -701,10 +746,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, currentA
                     {AVATAR_OPTIONS.map((av, idx) => (
                       <button 
                         key={idx} 
-                        onClick={() => setAvatar(av)}
-                        className={`rounded-full overflow-hidden border-2 transition-all hover:scale-110 ${currentAvatar === av ? `border-${isDarkMode ? 'white' : 'black'} ring-2 ring-${isDarkMode ? 'white/20' : 'black/20'} scale-110` : 'border-transparent opacity-50 hover:opacity-100'}`}
+                        onClick={() => { if(av) setAvatar(av); }}
+                        className={`rounded-full overflow-hidden border-2 transition-all hover:scale-110 aspect-square ${currentAvatar === av ? `border-${isDarkMode ? 'white' : 'black'} ring-2 ring-${isDarkMode ? 'white/20' : 'black/20'} scale-110` : 'border-transparent opacity-50 hover:opacity-100'}`}
                       >
-                        <img src={av} alt={`Avatar ${idx}`} className="w-full h-full" />
+                        {av && <img src={av} alt={`Avatar ${idx}`} className="w-full h-full object-cover" />}
                       </button>
                     ))}
                  </div>
@@ -768,22 +813,67 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, currentA
   );
 };
 
+// --- Command/AI Interface Component (Similar to Screenshot) ---
+const AICommandModal: React.FC<{ isOpen: boolean; onClose: () => void; isDarkMode: boolean }> = ({ isOpen, onClose, isDarkMode }) => {
+    if (!isOpen) return null;
+    
+    return (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md animate-in fade-in duration-300 px-4 pb-4 md:pb-0">
+        <div className={`relative w-full max-w-md rounded-2xl shadow-2xl animate-in zoom-in-95 duration-300 border flex flex-col overflow-hidden ${isDarkMode ? 'bg-[#1a1a1a] border-white/10 text-white' : 'bg-white border-black/10 text-black'}`}>
+            
+            {/* Header */}
+            <div className={`p-4 border-b flex justify-between items-center ${isDarkMode ? 'border-white/5 bg-white/5' : 'border-black/5 bg-black/5'}`}>
+               <div className="flex items-center gap-3">
+                  <div className={`w-2 h-2 rounded-full animate-pulse ${isDarkMode ? 'bg-green-400' : 'bg-green-600'}`}></div>
+                  <span className="text-xs font-black uppercase tracking-[0.2em]">System Command</span>
+               </div>
+               <button onClick={onClose}><X size={16} className="opacity-50" /></button>
+            </div>
+
+            {/* Chat Body */}
+            <div className="p-6 min-h-[300px] flex flex-col justify-center items-center text-center space-y-4">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-2 ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>
+                    <Cpu size={24} />
+                </div>
+                <h3 className="text-lg font-bold">System initialized.</h3>
+                <p className={`text-sm ${isDarkMode ? 'text-white/60' : 'text-black/60'}`}>Standing by for commands, Boss.</p>
+            </div>
+
+            {/* Input Area - Matches Screenshot Style */}
+            <div className="p-4 pt-0">
+                <div className={`flex items-center gap-2 p-2 rounded-xl border ${isDarkMode ? 'bg-black/30 border-white/10' : 'bg-black/5 border-black/5'}`}>
+                   <input 
+                      type="text" 
+                      placeholder="Type command..." 
+                      className="flex-1 bg-transparent border-none outline-none px-2 text-base font-medium"
+                      autoFocus
+                   />
+                   <button className={`p-3 rounded-lg transition-transform active:scale-95 ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>
+                      <Send size={18} />
+                   </button>
+                </div>
+            </div>
+
+        </div>
+      </div>
+    );
+};
+
 // --- Main Application ---
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [isChatOpen, setIsChatOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   
   // Gimmick State
   const [gimmickTitle, setGimmickTitle] = useState('');
-  const [gimmickMode, setGimmickMode] = useState('default');
   const [isGimmickOpen, setIsGimmickOpen] = useState(false);
+  const [isAIModalOpen, setIsAIModalOpen] = useState(false); // New AI Modal
 
   // Settings State
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [avatar, setAvatar] = useState<string>(AVATAR_OPTIONS[6] || AVATAR_OPTIONS[0] || ""); // Strict String Fallback
+  const [avatar, setAvatar] = useState<string>(AVATAR_OPTIONS[6] || AVATAR_OPTIONS[0] || "");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [language, setLanguage] = useState('en');
 
@@ -812,12 +902,13 @@ const App: React.FC = () => {
     return ALL_RESOURCES.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
   }, [searchQuery]);
 
-  const triggerGimmick = (title: string, mode: string = 'default') => {
+  const triggerGimmick = (title: string) => {
     if(title === 'System Settings') {
         setIsSettingsOpen(true);
+    } else if (title === 'AI System') {
+        setIsAIModalOpen(true); // Open the fix for the screenshot issue
     } else {
         setGimmickTitle(title);
-        setGimmickMode(mode);
         setIsGimmickOpen(true);
     }
   };
@@ -825,8 +916,8 @@ const App: React.FC = () => {
   return (
     <div className={`flex h-screen font-sans selection:bg-black selection:text-white overflow-hidden transition-colors duration-500 ${isDarkMode ? 'bg-neutral-950 text-white' : 'bg-[#FDFDFD] text-black'}`}>
       
-      {/* Sidebar - Precision Aligned */}
-      <aside className={`w-28 border-r flex flex-col items-center py-6 z-30 ${isDarkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-black/10'}`}>
+      {/* Sidebar - Desktop */}
+      <aside className={`hidden md:flex w-28 border-r flex-col items-center py-6 z-30 ${isDarkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-black/10'}`}>
         <div onClick={() => setActiveTab('dashboard')} className="mb-2 hover:scale-110 transition-transform cursor-pointer h-10 w-10 flex items-center justify-center">
         </div>
         
@@ -859,12 +950,12 @@ const App: React.FC = () => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
         
-        <header className={`h-28 backdrop-blur-xl border-b px-16 flex items-center justify-between sticky top-0 z-20 ${isDarkMode ? 'bg-neutral-900/50 border-white/10' : 'bg-white/50 border-black/10'}`}>
+        <header className={`h-20 md:h-28 backdrop-blur-xl border-b px-4 md:px-16 flex items-center justify-between sticky top-0 z-20 ${isDarkMode ? 'bg-neutral-900/50 border-white/10' : 'bg-white/50 border-black/10'}`}>
           <div className="flex items-center gap-6">
-             <span className={`text-[10px] font-black uppercase tracking-[0.5em] flex items-center ${isDarkMode ? 'text-white' : 'text-black'}`}>SYSTEM | KREAVITYWORKS</span>
+             <span className={`text-[10px] font-black uppercase tracking-[0.1em] md:tracking-[0.5em] flex items-center ${isDarkMode ? 'text-white' : 'text-black'}`}>SYSTEM | KREAVITYWORKS</span>
           </div>
 
-          <div className="flex items-center gap-6 flex-1 max-w-2xl justify-end">
+          <div className="flex items-center gap-2 md:gap-6 flex-1 max-w-2xl justify-end">
             <div className="relative w-full max-w-md hidden md:block">
               <Search className={`absolute left-5 top-1/2 -translate-y-1/2 ${isDarkMode ? 'text-white/20' : 'text-black/20'}`} size={16} />
               <input 
@@ -892,15 +983,20 @@ const App: React.FC = () => {
               )}
             </div>
             
-            <div className={`flex items-center gap-4 pl-6 border-l ${isDarkMode ? 'border-white/5' : 'border-black/5'}`}>
-                <button onClick={() => triggerGimmick('System Notifications')} className={`relative p-3 transition-all rounded-xl ${isDarkMode ? 'text-white/30 hover:text-white hover:bg-white/5' : 'text-black/30 hover:text-black hover:bg-black/5'}`}>
-                  <Bell size={22} />
-                  <span className="absolute top-3 right-3 w-2 h-2 rounded-full border-2 border-inherit bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+            <div className={`flex items-center gap-3 md:gap-4 pl-0 md:pl-6 md:border-l ${isDarkMode ? 'border-white/5' : 'border-black/5'}`}>
+                {/* Mobile Command Trigger - Fix for "AI" access on Mobile */}
+                <button onClick={() => setIsAIModalOpen(true)} className={`md:hidden relative p-2 transition-all rounded-xl ${isDarkMode ? 'text-white/30 hover:text-white hover:bg-white/5' : 'text-black/30 hover:text-black hover:bg-black/5'}`}>
+                    <MessageSquare size={20} />
+                </button>
+
+                <button onClick={() => triggerGimmick('System Notifications')} className={`relative p-2 md:p-3 transition-all rounded-xl ${isDarkMode ? 'text-white/30 hover:text-white hover:bg-white/5' : 'text-black/30 hover:text-black hover:bg-black/5'}`}>
+                  <Bell size={20} className="md:w-6 md:h-6" />
+                  <span className="absolute top-2 right-2 md:top-3 md:right-3 w-2 h-2 rounded-full border-2 border-inherit bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
                 </button>
                 
                 <button onClick={() => setIsSettingsOpen(true)} className="group relative">
-                   <div className={`w-12 h-12 rounded-full overflow-hidden border-2 border-transparent transition-all shadow-sm ${isDarkMode ? 'group-hover:border-white/10' : 'group-hover:border-black/10'}`}>
-                      <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
+                   <div className={`w-9 h-9 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-transparent transition-all shadow-sm ${isDarkMode ? 'group-hover:border-white/10' : 'group-hover:border-black/10'}`}>
+                      <img src={avatar || AVATAR_OPTIONS[0]} alt="Profile" className="w-full h-full object-cover" />
                    </div>
                 </button>
             </div>
@@ -908,8 +1004,8 @@ const App: React.FC = () => {
           </div>
         </header>
 
-        <section className="flex-1 overflow-y-auto px-16 py-16 scroll-smooth relative">
-          <div className="max-w-[1400px] ml-0 pb-20">
+        <section className="flex-1 overflow-y-auto px-4 md:px-16 py-6 md:py-16 scroll-smooth relative pb-28 md:pb-20">
+          <div className="max-w-[1400px] ml-0">
             {activeTab === 'dashboard' && <UpdatesView isDarkMode={isDarkMode} />}
             {activeTab === 'calendar' && <CalendarView onAddEvent={triggerGimmick} isDarkMode={isDarkMode} />}
             {activeTab === 'queue' && <QueueView isDarkMode={isDarkMode} />}
@@ -920,6 +1016,25 @@ const App: React.FC = () => {
         </section>
       </main>
 
+      {/* Mobile Bottom Navigation - Added pb-safe */}
+      <nav className={`md:hidden fixed bottom-0 w-full pb-safe pt-2 px-6 flex justify-between items-center border-t backdrop-blur-xl z-40 ${isDarkMode ? 'bg-neutral-900/90 border-white/10' : 'bg-white/90 border-black/10'}`}>
+        {menuItems.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => setActiveTab(item.id)}
+            className={`p-3 rounded-xl transition-all duration-300 flex flex-col items-center gap-1 ${
+              activeTab === item.id 
+                ? (isDarkMode ? 'text-white' : 'text-black') 
+                : (isDarkMode ? 'text-white/40' : 'text-black/30')
+            }`}
+          >
+            {React.cloneElement(item.icon, { size: 20 })}
+            {activeTab === item.id && <span className="w-1 h-1 rounded-full bg-current"></span>}
+          </button>
+        ))}
+      </nav>
+
+      {/* Gimmick Modal */}
       <ModalWrapper isOpen={isGimmickOpen} onClose={() => setIsGimmickOpen(false)} title={gimmickTitle} isDarkMode={isDarkMode}>
           <div className="space-y-4">
              <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-white/60' : 'text-black/60'}`}>Fitur sedang diproses sistem.</p>
@@ -929,6 +1044,9 @@ const App: React.FC = () => {
           </div>
       </ModalWrapper>
       
+      {/* AI Command Modal - Specific fix for screenshot */}
+      <AICommandModal isOpen={isAIModalOpen} onClose={() => setIsAIModalOpen(false)} isDarkMode={isDarkMode} />
+
       <SettingsModal 
          isOpen={isSettingsOpen} 
          onClose={() => setIsSettingsOpen(false)} 
@@ -942,37 +1060,6 @@ const App: React.FC = () => {
          setUserProfile={setUserProfile}
       />
 
-      {/* AI Assistant - Ultra Sharp Monochrome (Single System Focus) */}
-      <div className={`fixed bottom-10 right-10 z-50 flex flex-col items-end transition-all duration-500 ${isChatOpen ? 'w-[400px]' : 'w-20'}`}>
-        {isChatOpen && (
-          <div className={`w-full h-[600px] rounded-2xl shadow-2xl border flex flex-col overflow-hidden mb-6 animate-in slide-in-from-bottom-8 ${isDarkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-black/10'}`}>
-            <div className={`p-8 flex justify-between items-center ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}>
-              <div className="flex items-center gap-4">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-black ${isDarkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>AI</div>
-                <div>
-                  <h4 className="text-base font-black tracking-tight uppercase">System Core</h4>
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                    <span className={`text-[9px] uppercase tracking-widest font-black ${isDarkMode ? 'text-black/40' : 'text-white/40'}`}>Online Engine</span>
-                  </div>
-                </div>
-              </div>
-              <button onClick={() => setIsChatOpen(false)} className={`transition-colors ${isDarkMode ? 'text-black/40 hover:text-black' : 'text-white/40 hover:text-white'}`}><X size={24} /></button>
-            </div>
-            <div className="flex-1 p-8 overflow-y-auto space-y-6">
-              <div className={`p-5 rounded-xl rounded-tl-none text-[13px] leading-relaxed font-bold tracking-tight ${isDarkMode ? 'bg-white/5 text-white' : 'bg-black/5 text-black'}`}>System calibrated, Boss Nando. Monochrome aesthetics and semi-square rounded geometry applied globally.</div>
-            </div>
-            <div className={`p-6 border-t flex gap-3 ${isDarkMode ? 'bg-neutral-900 border-white/5' : 'bg-white border-black/5'}`}>
-              <input type="text" placeholder="Command system..." className={`flex-1 rounded-xl px-5 py-4 text-sm outline-none font-bold transition-all ${isDarkMode ? 'bg-white/5 focus:bg-white/10 text-white placeholder-white/30' : 'bg-black/5 focus:bg-black/10 text-black'}`} />
-              <button className={`w-14 h-14 rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}><Send size={20} /></button>
-            </div>
-          </div>
-        )}
-        <button onClick={() => setIsChatOpen(!isChatOpen)} className={`w-20 h-20 rounded-2xl shadow-2xl flex items-center justify-center transition-all duration-500 ${isDarkMode ? (isChatOpen ? 'bg-white text-black rotate-90' : 'bg-white text-black hover:scale-105') : (isChatOpen ? 'bg-black text-white rotate-90' : 'bg-black text-white hover:scale-105')}`}>
-          {isChatOpen ? <Plus size={32} /> : <MessageSquare size={32} />}
-        </button>
-      </div>
-
       <style dangerouslySetInnerHTML={{ __html: `
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; }
@@ -983,6 +1070,9 @@ const App: React.FC = () => {
         ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         [contenteditable]:focus { outline: none; background: rgba(0,0,0,0.02); border-radius: 4px; padding: 0 4px; }
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+          .pb-safe { padding-bottom: env(safe-area-inset-bottom); padding-bottom: max(env(safe-area-inset-bottom), 20px); }
+        }
       `}} />
     </div>
   );
